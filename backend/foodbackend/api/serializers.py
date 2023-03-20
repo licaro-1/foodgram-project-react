@@ -3,9 +3,7 @@ from rest_framework.validators import UniqueValidator
 
 from users.models import User
 from CapabilitiesUser.models import Subscription, ShoppingCart
-from Ingredients.models import Ingredient
-from Tags.models import Tag
-from Recipes.models import Recipe
+from Recipes.models import Recipe, Tag, Ingredient, RecipeIngredients
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -89,6 +87,23 @@ class IngredientsSerializer(serializers.ModelSerializer):
         )
 
 
+class RecipeIngredientsSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='ingredient.id')
+    name = serializers.ReadOnlyField(source='ingredient.name')
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit',
+    )
+
+    class Meta:
+        model = RecipeIngredients
+        fields = (
+            'id',
+            'name',
+            'measurement_unit',
+            'amount',
+        )
+
+
 class TagsSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -106,9 +121,10 @@ class RecipesSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     author = UserSerializer(read_only=True)
     tags = TagsSerializer(many=True)
-    ingredients = IngredientsSerializer(many=True)
+    ingredients = RecipeIngredientsSerializer(source='recipe_ingredients',many=True)
 
     class Meta:
+        model = Recipe
         fields = (
             'id',
             'tags',
@@ -124,27 +140,28 @@ class RecipesSerializer(serializers.ModelSerializer):
 
     def get_is_in_shopping_cart(self, obj):
         """Проверка на вхождение рецепта в список покупок."""
-        print(obj)
-        if self.request.user.is_authenticated:
-            recipe = Recipe.objects.filter(id=obj.id)
+        request = self.context['request']
+        if request.user.is_authenticated:
+            recipe = Recipe.objects.get(id=obj.id)
             recipe_in_shop_cart = recipe.recipes.filter(
-                author=self.request.user
+                author=request.user
             )
             if len(recipe_in_shop_cart) != 0:
                 return True
         return False
 
-    def is_favorited(self, obj):
+    def get_is_favorited(self, obj):
         """Проверка на вхождение рецепта в список избранных."""
-        if self.request.user.is_authenticated:
-            recipe = Recipe.objects.filter(id=obj.id)
+        request = self.context['request']
+        if request.user.is_authenticated:
+            recipe = Recipe.objects.get(id=obj.id)
             recipe_is_favorited = recipe.recipes_fav.filter(
-                user=self.request.user
+                author=request.user
             )
             if len(recipe_is_favorited) != 0:
                 return True
         return False
-            
+
 
 
 

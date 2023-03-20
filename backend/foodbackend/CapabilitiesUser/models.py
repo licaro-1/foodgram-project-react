@@ -22,6 +22,14 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Список покупок'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'recipe'],
+                name='UniqueShoppingCart'
+            
+            )
+        ]
+        
 
 
 class Favourites(models.Model):
@@ -41,9 +49,16 @@ class Favourites(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Избранное'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'recipe'],
+                name='UniqueFavorite'
+            
+            )
+        ]
 
     def __str__(self):
-        return self.recipe.title
+        return self.recipe.name
 
 
 class Subscription(models.Model):
@@ -63,3 +78,10 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'],
+                name='UniqueSubscribtion'
+            
+            )
+        ]

@@ -15,9 +15,8 @@ from .serializers import (
 from .permissions import isAdminOwnerOrReadOnly, IsAdmin
 
 from users.models import User
-from Ingredients.models import Ingredient
-from Tags.models import Tag
 from CapabilitiesUser.models import Subscription
+from Recipes.models import Recipe, Tag, Ingredient
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -66,6 +65,14 @@ class UserViewSet(viewsets.ModelViewSet):
                 user.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors)
+    
+    def get_permissions(self):
+        try:
+            # return permission_classes depending on `action` 
+            return [permission() for permission in self.permission_classes_by_action[self.action]]
+        except KeyError: 
+            # action is not set return default permission_classes
+            return [permission() for permission in self.permission_classes]
 
 
 class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -91,3 +98,10 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipesSerializer
+    permission_classes = [AllowAny,]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def get_serializer_context(self):
+        return {'request': self.request}

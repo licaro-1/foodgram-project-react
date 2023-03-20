@@ -2,8 +2,47 @@ from django.db import models
 from django.core.validators import MinValueValidator
 
 from users.models import User
-from Ingredients.models import Ingredient
-from Tags.models import Tag
+
+
+class Ingredient(models.Model):
+    """Модель ингредиентов."""
+    name = models.CharField(
+        'Название',
+        max_length=150
+    )
+    measurement_unit = models.CharField(
+        'Единица измерения',
+        max_length=50
+    )
+
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+
+    def __str__(self):
+        return self.name
+
+
+class Tag(models.Model):
+    """Модель тега."""
+    name = models.CharField(
+        'Название',
+        max_length=154
+    )
+    color = models.CharField(
+        'Цвет',
+        max_length=7
+    )
+    slug = models.SlugField(
+        max_length=64
+    )
+
+    class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
+
+    def __str__(self):
+        return self.name
 
 
 class Recipe(models.Model):
@@ -14,15 +53,13 @@ class Recipe(models.Model):
         verbose_name='Автор',
         related_name='recipe_author'
     )
-    title = models.CharField(
+    name = models.CharField(
         'Название',
         max_length=120
     )
-    ingrediens = models.ForeignKey(
+    ingredients = models.ManyToManyField(
         Ingredient, 
-        on_delete=models.SET_NULL,
         verbose_name='Ингредиенты',
-        null=True
     )
     text = models.TextField(
         'Описание'
@@ -37,11 +74,9 @@ class Recipe(models.Model):
         validators=[MinValueValidator(1)]
     )
 
-    tag = models.ForeignKey(
+    tags = models.ManyToManyField(
         Tag,
-        on_delete=models.SET_NULL,
-        verbose_name='Тэг',
-        null=True
+        verbose_name='Тэг'
     )
 
     class Meta:
@@ -49,4 +84,32 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        return self.title
+        return self.name
+
+
+class RecipeIngredients(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe_ingredients'
+    )
+    ingredient = models.ForeignKey(
+        Ingredient, 
+        on_delete=models.CASCADE,
+        related_name='recipe_ingredients'
+        )
+    amount = models.PositiveIntegerField('Количество')
+
+    class Meta:
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецепте'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='UniqueIngredientRecipe'
+            
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.ingredient} - {self.amount}'
