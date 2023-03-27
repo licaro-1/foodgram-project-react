@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 
 from CapabilitiesUser.models import Subscription, ShoppingCart, Favourites
 from users.models import User
-from Recipes.models import Recipe, Tag, Ingredient, RecipeIngredients
+from Recipes.models import Recipe, Tag, Ingredient, RecipeIngredients, RecipeTags
 
 
 
@@ -22,7 +22,7 @@ class IngredientsAdmin(admin.ModelAdmin):
 
 class RecipesAdmin(admin.ModelAdmin):
     """Админка рецептов."""
-    list_display = ['name', 'author']
+    list_display = ['id', 'name', 'author']
     list_filter = ('author', 'name', 'tags')
 
 
@@ -34,3 +34,4 @@ admin.site.register(Tag)
 admin.site.register(Subscription)
 admin.site.register(ShoppingCart)
 admin.site.register(Favourites)
+admin.site.register(RecipeTags)

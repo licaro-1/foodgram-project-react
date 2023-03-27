@@ -27,7 +27,8 @@ class Tag(models.Model):
     """Модель тега."""
     name = models.CharField(
         'Название',
-        max_length=154
+        max_length=154,
+        unique=True
     )
     color = models.CharField(
         'Цвет',
@@ -40,6 +41,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
+
 
     def __str__(self):
         return self.name
@@ -59,7 +61,7 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredient, 
-        verbose_name='Ингредиенты',
+        verbose_name='Ингредиенты'
     )
     text = models.TextField(
         'Описание'
@@ -76,7 +78,8 @@ class Recipe(models.Model):
 
     tags = models.ManyToManyField(
         Tag,
-        verbose_name='Тэг'
+        verbose_name='Тэг',
+        related_name='tags'
     )
 
     class Meta:
@@ -113,3 +116,20 @@ class RecipeIngredients(models.Model):
 
     def __str__(self):
         return f'{self.ingredient} - {self.amount}'
+
+
+class RecipeTags(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe_tags'
+    )
+    tags = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+        related_name='recipes_by_tag'
+    )
+
+    class Meta:
+        verbose_name = 'Тег в рецепте'
+        verbose_name_plural = 'Теги в рецептах'
