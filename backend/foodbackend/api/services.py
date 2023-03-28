@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from Recipes.models import Recipe, RecipeTags, RecipeIngredients
 
+
 class ImageField(serializers.ImageField):
     """Поле для изображения."""
 
@@ -65,3 +66,16 @@ def create_update_recipe_tags_ingredients(recipe, tags_list = None, ingredients_
                 )
                 recipeingredient.save()
     return recipe
+
+
+def create_shopp_cart_file(user):
+    shop_cart_list = {}
+    for ingredient_name, measanumerate, amount in RecipeIngredients.objects.filter(
+        recipe__recipes_shop_cart__author=user
+        ).values_list('ingredient__name', 'ingredient__measurement_unit', 'amount'):
+        title = f'{ingredient_name} ({measanumerate})'
+        if title not in shop_cart_list.keys():
+            shop_cart_list[title] = int(amount)
+        else:
+            shop_cart_list[title] += int(amount)
+    print(shop_cart_list)

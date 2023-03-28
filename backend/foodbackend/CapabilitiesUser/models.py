@@ -29,6 +29,9 @@ class ShoppingCart(models.Model):
             
             )
         ]
+    
+    def __str__(self):
+        return self.recipe.name
 
 
 class Favourites(models.Model):
@@ -45,6 +48,7 @@ class Favourites(models.Model):
         verbose_name='Рецепт',
         related_name='recipes_fav'
     )
+
 
     class Meta:
         verbose_name = 'Рецепт'

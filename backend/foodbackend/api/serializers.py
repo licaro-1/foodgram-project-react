@@ -279,9 +279,11 @@ class SubscriptionsSerializer(serializers.ModelSerializer, IsSubscribed):
 
     def get_recipes(self, obj):
         request = self.context['request']
-        set_limit = request.GET.get('recipes_limit')
-        if set_limit:
-            queryset = Recipe.objects.all().filter(author__id=obj.author.id)[:int(set_limit)]
+        limit_recipes_value = request.GET.get('recipes_limit')
+        if limit_recipes_value:
+            queryset = Recipe.objects.all().filter(
+                author__id=obj.author.id
+            )[:int(limit_recipes_value)]
         else:
             queryset = Recipe.objects.filter(author__id=obj.author.id).all()
         serializer = SmallRecipeSerializer(queryset, many=True)
