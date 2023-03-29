@@ -8,30 +8,8 @@ from rest_framework.response import Response
 from users.models import User
 from CapabilitiesUser.models import Subscription, ShoppingCart, Favourites
 from Recipes.models import Recipe, Tag, Ingredient, RecipeIngredients, RecipeTags
-from .services import ImageField, IsFavAndInShopCart, create_update_recipe_tags_ingredients
-
-
-class IsSubscribed(serializers.Serializer):
-    is_subscribed = serializers.SerializerMethodField()
-
-    def get_is_subscribed(self, obj):
-        request = self.context['request']
-        if isinstance(obj, User):
-            user_id = obj.id
-        elif isinstance(obj, dict):
-            return obj['is_subscribed']
-        else:
-            user_id = obj.author.id
-        author = get_object_or_404(User, id=user_id)
-        if request.user.is_authenticated and author != request.user:
-            subscribe_checker = Subscription.objects.filter(
-                user = request.user,
-                author=author
-            )
-            if subscribe_checker:
-                return True
-        return False
-    pass
+from .common.common_serializers import ImageField, IsFavAndInShopCart, IsSubscribed
+from Recipes.services import create_update_recipe_tags_ingredients
 
 
 class UserSerializer(serializers.ModelSerializer, IsSubscribed):
@@ -288,15 +266,3 @@ class SubscriptionsSerializer(serializers.ModelSerializer, IsSubscribed):
             queryset = Recipe.objects.filter(author__id=obj.author.id).all()
         serializer = SmallRecipeSerializer(queryset, many=True)
         return serializer.data
-
-
-class FavoriteSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Favourites
-        fields = (
-            'id',
-            'name',
-            'image',
-            'cooking_time'
-        )
