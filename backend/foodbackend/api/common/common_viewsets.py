@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -8,7 +8,8 @@ from ..permissions import isAdminOwnerOrReadOnly
 
 class CommonUserViewSet(viewsets.ViewSet):
     """
-    Общий вьюсет пользователя с методами изменения пароля и отображения личной информации.
+    Общий вьюсет пользователя с методами изменения 
+    пароля и отображения личной информации.
     """
 
     @action(
@@ -17,9 +18,9 @@ class CommonUserViewSet(viewsets.ViewSet):
     )
     def me(self, request):
         user = self.request.user
-        serializer = UserSerializer(user, context={'request':request})
+        serializer = UserSerializer(user, context={'request': request})
         return Response(serializer.data)
-    
+
     @action(
         detail=False,
         methods=['post'],

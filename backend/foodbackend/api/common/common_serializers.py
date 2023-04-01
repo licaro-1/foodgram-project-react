@@ -4,7 +4,7 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
-from Recipes.models import Recipe, RecipeTags, RecipeIngredients
+from Recipes.models import Recipe
 from users.models import User
 from CapabilitiesUser.models import Subscription
 
@@ -69,10 +69,9 @@ class IsSubscribed(serializers.Serializer):
         author = get_object_or_404(User, id=user_id)
         if request.user.is_authenticated and author != request.user:
             subscribe_checker = Subscription.objects.filter(
-                user = request.user,
+                user=request.user,
                 author=author
             )
             if subscribe_checker:
                 return True
         return False
-    pass

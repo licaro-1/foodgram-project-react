@@ -9,6 +9,6 @@ class MainPagination(PageNumberPagination):
 class RecipePagination(MainPagination):
     pass
 
+
 class SubscriptionPagination(MainPagination):
     pass
-    

@@ -2,13 +2,13 @@ import re
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
 
 from users.models import User
-from CapabilitiesUser.models import Subscription, ShoppingCart, Favourites
-from Recipes.models import Recipe, Tag, Ingredient, RecipeIngredients, RecipeTags
-from .common.common_serializers import ImageField, IsFavAndInShopCart, IsSubscribed
+from CapabilitiesUser.models import Subscription
+from Recipes.models import Recipe, Tag, Ingredient, RecipeIngredients
+from .common.common_serializers import (ImageField,
+                                        IsFavAndInShopCart,
+                                        IsSubscribed)
 from Recipes.services import create_update_recipe_tags_ingredients
 
 
@@ -45,6 +45,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         ],
         required=True,
     )
+
     class Meta:
         model = User
         fields = (
@@ -132,6 +133,7 @@ class TagsSerializer(serializers.ModelSerializer):
         if not color:
             raise serializers.ValidationError('Цвет должен быть формата HEX')
         return value
+
 
 class RecipesListSerializer(serializers.ModelSerializer, IsFavAndInShopCart):
     author = UserSerializer(read_only=True)

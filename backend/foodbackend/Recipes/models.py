@@ -42,7 +42,6 @@ class Tag(models.Model):
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
 
-
     def __str__(self):
         return self.name
 
@@ -133,3 +132,7 @@ class RecipeTags(models.Model):
     class Meta:
         verbose_name = 'Тег в рецепте'
         verbose_name_plural = 'Теги в рецептах'
+
+    def __str__(self) -> str:
+        return f'{self.recipe.name} - {self.tags.name}'
+ 

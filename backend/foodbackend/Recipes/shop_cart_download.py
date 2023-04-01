@@ -11,13 +11,15 @@ from rest_framework.views import APIView
 from .services import _get_ingredients_dictionary_by_user
 from rest_framework.permissions import IsAuthenticated
 
+
 class DownloadCart(APIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
         user = request.user
         shop_cart_list = _get_ingredients_dictionary_by_user(user)
-        pdfmetrics.registerFont(TTFont('wiguru-13', './Recipes/ttf/wiguru-13.ttf'))
+        pdfmetrics.registerFont(
+            TTFont('wiguru-13', './Recipes/ttf/wiguru-13.ttf'))
         buffer = io.BytesIO()
         file = canvas.Canvas(buffer)
         file.setFont('wiguru-13', 40)
@@ -31,5 +33,4 @@ class DownloadCart(APIView):
         file.save()
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True,
-                                filename='shop_cart_list.pdf')
-
+                            filename='shop_cart_list.pdf')

@@ -1,11 +1,9 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, mixins
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.generics import ListAPIView
 
 from .serializers import (
     UserSerializer,
@@ -17,7 +15,7 @@ from .serializers import (
     RecipePostSerializer,
     SmallRecipeSerializer
 )
-from.paginaton import RecipePagination
+from .paginaton import RecipePagination
 from .permissions import isAdminOwnerOrReadOnly
 from users.models import User
 from CapabilitiesUser.models import Subscription, ShoppingCart, Favourites
@@ -31,7 +29,7 @@ from CapabilitiesUser.services import (
     add_recipe_to_favourite,
     revome_recipe_from_favourite
 )
-from Recipes.models import Recipe, Tag, Ingredient, RecipeIngredients
+from Recipes.models import Recipe, Tag, Ingredient
 from .filters import RecipeFilter, IngredientFilter
 from api.common.common_viewsets import CommonUserViewSet
 
@@ -40,9 +38,9 @@ class ListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     pass
 
 
-class CreateDestroyViewSet(mixins.CreateModelMixin, 
-                        mixins.DestroyModelMixin,
-                        viewsets.GenericViewSet):
+class CreateDestroyViewSet(mixins.CreateModelMixin,
+                           mixins.DestroyModelMixin,
+                           viewsets.GenericViewSet):
     pass
 
 
@@ -65,9 +63,9 @@ class UserViewSet(viewsets.ModelViewSet, CommonUserViewSet):
 
     def get_permissions(self):
         try:
-            return [permission() for permission 
-            in self.permission_classes_by_action[self.action]]
-        except KeyError: 
+            return [permission() for permission in
+                    self.permission_classes_by_action[self.action]]
+        except KeyError:
             return [permission() for permission in self.permission_classes]
 
 
@@ -76,11 +74,13 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     filterset_class = IngredientFilter
     filter_backends = [DjangoFilterBackend]
+    permission_classes = [AllowAny, ]
 
 
 class TagsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagsSerializer
+    permission_classes = [AllowAny, ]
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
@@ -101,7 +101,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def get_serializer_class(self):
-        if self.action == ('create' or 'update'):
+        if self.action == 'create' or 'update':
             return RecipePostSerializer
         return RecipesListSerializer
 
@@ -126,15 +126,23 @@ class RecipesViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         instance_serializer = RecipesListSerializer(
-            recipe, 
+            recipe,
             context={'request': request}
         )
         return Response(instance_serializer.data)
 
+    def get_permissions(self):
+        try:
+            return [permission() for permission in
+                    self.permission_classes_by_action[self.action]]
+        except KeyError:
+            return [permission() for permission in self.permission_classes]
+
 
 class SubscriptionsListViewSet(ListViewSet):
     serializer_class = SubscriptionsSerializer
-    
+    permission_classes = (IsAuthenticated, )
+
     def get_queryset(self):
         queryset = Subscription.objects.filter(
             user=self.request.user
@@ -158,7 +166,9 @@ class SubscriptionCreateDestroyViewSet(CreateDestroyViewSet):
 
     def destroy(self, request, user_id=None):
         author = get_object_or_404(User, id=user_id)
-        delete_subscribe = delete_subscribtion_by_user_and_author(request.user, author)
+        delete_subscribe = delete_subscribtion_by_user_and_author(
+            request.user,
+            author)
         if delete_subscribe is None:
             return Response(status=status.HTTP_204_NO_CONTENT)
         errors = {

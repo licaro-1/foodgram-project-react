@@ -26,10 +26,10 @@ class ShoppingCart(models.Model):
             models.UniqueConstraint(
                 fields=['author', 'recipe'],
                 name='UniqueShoppingCart'
-            
+
             )
         ]
-    
+
     def __str__(self):
         return self.recipe.name
 
@@ -49,7 +49,6 @@ class Favourites(models.Model):
         related_name='recipes_fav'
     )
 
-
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Избранное'
@@ -57,7 +56,7 @@ class Favourites(models.Model):
             models.UniqueConstraint(
                 fields=['author', 'recipe'],
                 name='UniqueFavorite'
-            
+
             )
         ]
 
@@ -86,6 +85,6 @@ class Subscription(models.Model):
             models.UniqueConstraint(
                 fields=['user', 'author'],
                 name='UniqueSubscribtion'
-            
+
             )
         ]
