@@ -3,8 +3,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, mixins
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.pagination import LimitOffsetPagination
 
+from .paginaton import MainPagination
+from .permissions import IsAdminOwnerOrReadOnly
+from users.models import User
+from CapabilitiesUser.models import Subscription, ShoppingCart, Favourites
+from Recipes.models import Recipe, Tag, Ingredient
+from .filters import RecipeFilter, IngredientFilter
+from api.common.common_viewsets import CommonUserViewSet
 from .serializers import (
     UserSerializer,
     UserRegistrationSerializer,
@@ -15,23 +21,14 @@ from .serializers import (
     RecipePostSerializer,
     SmallRecipeSerializer
 )
-from .paginaton import RecipePagination
-from .permissions import isAdminOwnerOrReadOnly
-from users.models import User
-from CapabilitiesUser.models import Subscription, ShoppingCart, Favourites
 from CapabilitiesUser.services import (
     delete_subscribtion_by_user_and_author,
     create_subscribtion_by_user,
-
     add_recipe_to_shopping_cart,
     delete_recipe_from_shopping_cart,
-
     add_recipe_to_favourite,
     revome_recipe_from_favourite
 )
-from Recipes.models import Recipe, Tag, Ingredient
-from .filters import RecipeFilter, IngredientFilter
-from api.common.common_viewsets import CommonUserViewSet
 
 
 class ListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -47,26 +44,14 @@ class CreateDestroyViewSet(mixins.CreateModelMixin,
 class UserViewSet(viewsets.ModelViewSet, CommonUserViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes_by_action = {
-        'create': (AllowAny,),
-        'list': (AllowAny,),
-        'retrieve': (AllowAny,),
-        'destroy': (isAdminOwnerOrReadOnly,),
-        'patch': (isAdminOwnerOrReadOnly,)
-    }
+    permission_classes = [IsAdminOwnerOrReadOnly, ]
+    http_method_names = ['get', 'post', 'retrieve']
+    pagination_class = MainPagination
 
     def get_serializer_class(self):
         if self.action == 'create':
             return UserRegistrationSerializer
         return UserSerializer
-
-    def get_permissions(self):
-        try:
-            return [permission() for permission in
-                    self.permission_classes_by_action[self.action]]
-        except KeyError:
-            return [permission() for permission in self.permission_classes]
 
 
 class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -81,27 +66,23 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagsSerializer
     permission_classes = [AllowAny, ]
+    pagination_class = None
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipesListSerializer
-    pagination_class = RecipePagination
+    pagination_class = MainPagination
     filterset_class = RecipeFilter
     filter_backends = [DjangoFilterBackend, ]
-    permission_classes_by_action = {
-        'create': (IsAuthenticated,),
-        'list': (AllowAny,),
-        'retrieve': (AllowAny,),
-        'destroy': (isAdminOwnerOrReadOnly,),
-        'patch': (isAdminOwnerOrReadOnly,),
-    }
+    permission_classes = (IsAdminOwnerOrReadOnly, )
+    http_method_names = ['get', 'post', 'patch', 'retrieve', 'delete']
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
     def get_serializer_class(self):
-        if self.action == 'create' or 'update':
+        if self.action == 'create' or self.action == 'partial_update':
             return RecipePostSerializer
         return RecipesListSerializer
 
@@ -118,11 +99,11 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None, partial=True):
         recipe = get_object_or_404(Recipe, id=pk)
-        serializer = self.get_serializer(
-            data=request.data,
-            instance=recipe,
-            partial=True
-        )
+        if request.user.is_authenticated and recipe.author != request.user:
+            errors = {'errors': 'Вы не являетесь автором рецепта'}
+            return Response(errors, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(data=request.data, instance=recipe,
+                                         partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         instance_serializer = RecipesListSerializer(
@@ -131,22 +112,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
         )
         return Response(instance_serializer.data)
 
-    def get_permissions(self):
-        try:
-            return [permission() for permission in
-                    self.permission_classes_by_action[self.action]]
-        except KeyError:
-            return [permission() for permission in self.permission_classes]
-
 
 class SubscriptionsListViewSet(ListViewSet):
     serializer_class = SubscriptionsSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = MainPagination
 
     def get_queryset(self):
-        queryset = Subscription.objects.filter(
-            user=self.request.user
-        ).all()
+        queryset = Subscription.objects.filter(user=self.request.user).all()
         return queryset
 
 

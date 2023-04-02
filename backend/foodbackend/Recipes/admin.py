@@ -3,8 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 
 from CapabilitiesUser.models import Subscription, ShoppingCart, Favourites
 from users.models import User
-from Recipes.models import Recipe, Tag, Ingredient, RecipeIngredients, RecipeTags
-
+from Recipes.models import (Recipe, Tag, Ingredient, RecipeIngredients,
+                            RecipeTags)
 
 
 class UserAdmins(UserAdmin):
@@ -12,6 +12,7 @@ class UserAdmins(UserAdmin):
     model = User
     list_display = ['id', 'username', 'email']
     search_fields = ('email', 'username')
+    list_filter = ('email', 'username')
 
 
 class IngredientsAdmin(admin.ModelAdmin):
@@ -22,7 +23,7 @@ class IngredientsAdmin(admin.ModelAdmin):
 
 class RecipesAdmin(admin.ModelAdmin):
     """Админка рецептов."""
-    list_display = ['id', 'name', 'author']
+    list_display = ['id', 'name', 'author', 'add_to_favorite_count']
     list_filter = ('author', 'name', 'tags')
 
 

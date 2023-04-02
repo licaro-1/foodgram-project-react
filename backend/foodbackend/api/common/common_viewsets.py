@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.serializers import UserSerializer, UserChangePasswordSerializer
-from ..permissions import isAdminOwnerOrReadOnly
+from ..permissions import IsAdminOwnerOrReadOnly, IsAdminOrAuthor
 
 
 class CommonUserViewSet(viewsets.ViewSet):
@@ -14,7 +14,8 @@ class CommonUserViewSet(viewsets.ViewSet):
 
     @action(
         detail=False,
-        methods=['get']
+        methods=['get'],
+        permission_classes=[IsAdminOrAuthor, ]
     )
     def me(self, request):
         user = self.request.user
@@ -25,7 +26,7 @@ class CommonUserViewSet(viewsets.ViewSet):
         detail=False,
         methods=['post'],
         serializer_class=UserChangePasswordSerializer,
-        permission_classes=(isAdminOwnerOrReadOnly,),
+        permission_classes=(IsAdminOrAuthor,),
     )
     def set_password(self, request):
         user = self.request.user

@@ -6,7 +6,7 @@ class MainPagination(PageNumberPagination):
     page_size_query_param = 'limit'
 
 
-class RecipePagination(MainPagination):
+class CommonPagination(MainPagination):
     pass
 
 

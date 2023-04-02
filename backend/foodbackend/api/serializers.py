@@ -202,13 +202,12 @@ class RecipePostSerializer(serializers.ModelSerializer, IsFavAndInShopCart):
     def create(self, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('recipe_ingredients')
-        
         recipe = Recipe.objects.create(**validated_data)
         for tag_obj in tags:
             recipe.tags.add(tag_obj)
             recipe.save()
         for ingredient in ingredients:
-            ingedients = RecipeIngredients.objects.create(
+            RecipeIngredients.objects.create(
                 ingredient_id=ingredient['ingredient']['id'],
                 recipe=recipe,
                 amount=ingredient['amount']

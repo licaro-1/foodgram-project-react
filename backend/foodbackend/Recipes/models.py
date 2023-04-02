@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.shortcuts import get_object_or_404
 
 from users.models import User
 
@@ -74,19 +75,28 @@ class Recipe(models.Model):
         'Время приготовления',
         validators=[MinValueValidator(1)]
     )
-
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Тэг',
         related_name='tags'
     )
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('-created',)
 
     def __str__(self):
         return self.name
+
+    @property
+    def add_to_favorite_count(self):
+        recipe = get_object_or_404(Recipe, id=self.id)
+        return recipe.recipes_fav.all().count()
+
+    add_to_favorite_count.fget.short_description = 'Кол-во добавлений \
+                                                    в избранное'
 
 
 class RecipeIngredients(models.Model):
@@ -109,7 +119,7 @@ class RecipeIngredients(models.Model):
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
                 name='UniqueIngredientRecipe'
-            
+
             )
         ]
 
@@ -135,4 +145,3 @@ class RecipeTags(models.Model):
 
     def __str__(self) -> str:
         return f'{self.recipe.name} - {self.tags.name}'
- 
