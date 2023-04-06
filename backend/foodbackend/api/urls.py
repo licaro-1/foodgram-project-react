@@ -40,7 +40,7 @@ urlpatterns = [
             })),
     path('recipes/<int:pk>/favorite/',
          FavouritesViewSet.as_view({'delete': 'destroy', 'post': 'create'})),
-    path('', include(router.urls)),
     path('auth/token/login/', TokenCreateView.as_view(), name='login'),
     path('auth/token/logout/', TokenDestroyView.as_view(), name='logout'),
+    path('', include(router.urls)),
 ]

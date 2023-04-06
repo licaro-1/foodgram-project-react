@@ -5,12 +5,13 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .paginaton import MainPagination
-from .permissions import IsAdminOwnerOrReadOnly
+from .permissions import IsAdminOwnerOrReadOnly, IsAdmin
 from users.models import User
 from CapabilitiesUser.models import Subscription, ShoppingCart, Favourites
 from Recipes.models import Recipe, Tag, Ingredient
 from .filters import RecipeFilter, IngredientFilter
-from api.common.common_viewsets import CommonUserViewSet
+from api.common.common_viewsets import (CommonUserViewSet,
+                                        CommonPermissionByActionViewSet)
 from .serializers import (
     UserSerializer,
     UserRegistrationSerializer,
@@ -41,12 +42,18 @@ class CreateDestroyViewSet(mixins.CreateModelMixin,
     pass
 
 
-class UserViewSet(viewsets.ModelViewSet, CommonUserViewSet):
+class UserViewSet(viewsets.ModelViewSet, CommonUserViewSet,
+                  CommonPermissionByActionViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAdminOwnerOrReadOnly, ]
     http_method_names = ['get', 'post', 'retrieve']
     pagination_class = MainPagination
+    permission_classes_by_action = {
+        'create': [AllowAny, ],
+        'list': [AllowAny, ],
+        'retrieve': [AllowAny, ],
+        'destroy': [IsAdmin, ],
+    }
 
     def get_serializer_class(self):
         if self.action == 'create':

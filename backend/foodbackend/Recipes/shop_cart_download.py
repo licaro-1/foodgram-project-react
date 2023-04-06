@@ -1,12 +1,9 @@
 import io
-
 from django.http import FileResponse
-
+from rest_framework.views import APIView
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-
-from rest_framework.views import APIView
 
 from .services import _get_ingredients_dictionary_by_user
 from rest_framework.permissions import IsAuthenticated

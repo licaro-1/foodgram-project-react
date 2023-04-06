@@ -1,5 +1,3 @@
-import re
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -128,12 +126,6 @@ class TagsSerializer(serializers.ModelSerializer):
             'color': {'required': False}
         }
 
-    def validate_color(self, value):
-        color = re.match('^#(?:[0-9a-fA-F]{3}){1,2}$', value)
-        if not color:
-            raise serializers.ValidationError('Цвет должен быть формата HEX')
-        return value
-
 
 class RecipesListSerializer(serializers.ModelSerializer, IsFavAndInShopCart):
     author = UserSerializer(read_only=True)
@@ -217,7 +209,8 @@ class RecipePostSerializer(serializers.ModelSerializer, IsFavAndInShopCart):
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
+        instance.cooking_time = validated_data.get('cooking_time',
+                                                   instance.cooking_time)
         instance.image = validated_data.get('image', instance.image)
         tags_list = validated_data.get('tags')
         ingredients_list = validated_data.get('recipe_ingredients')

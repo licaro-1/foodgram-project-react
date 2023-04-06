@@ -31,7 +31,8 @@ def _get_ingredients_dictionary_by_user(user):
     находящихся в списке покупок пользователя.
     """
     shop_cart_list = {}
-    for ingredient_name, measanumerate, amount in RecipeIngredients.objects.filter(
+    for (ingredient_name, measanumerate,
+         amount) in RecipeIngredients.objects.filter(
         recipe__recipes_shop_cart__author=user
         ).values_list('ingredient__name', 'ingredient__measurement_unit',
                       'amount'):

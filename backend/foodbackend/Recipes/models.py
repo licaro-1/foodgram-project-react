@@ -1,3 +1,6 @@
+import re
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.shortcuts import get_object_or_404
@@ -24,6 +27,13 @@ class Ingredient(models.Model):
         return self.name
 
 
+def validate_color(value):
+    color_is_hex = re.match('^#(?:[0-9a-fA-F]{3}){1,2}$', value)
+    if not color_is_hex:
+        raise ValidationError('Цвет должен быть формата HEX')
+    return value
+
+
 class Tag(models.Model):
     """Модель тега."""
     name = models.CharField(
@@ -33,7 +43,8 @@ class Tag(models.Model):
     )
     color = models.CharField(
         'Цвет',
-        max_length=7
+        max_length=7,
+        validators=[validate_color]
     )
     slug = models.SlugField(
         max_length=64
@@ -60,7 +71,7 @@ class Recipe(models.Model):
         max_length=120
     )
     ingredients = models.ManyToManyField(
-        Ingredient, 
+        Ingredient,
         verbose_name='Ингредиенты'
     )
     text = models.TextField(
@@ -106,7 +117,7 @@ class RecipeIngredients(models.Model):
         related_name='recipe_ingredients'
     )
     ingredient = models.ForeignKey(
-        Ingredient, 
+        Ingredient,
         on_delete=models.CASCADE,
         related_name='recipe_ingredients'
         )
@@ -125,23 +136,3 @@ class RecipeIngredients(models.Model):
 
     def __str__(self):
         return f'{self.ingredient} - {self.amount}'
-
-
-class RecipeTags(models.Model):
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        related_name='recipe_tags'
-    )
-    tags = models.ForeignKey(
-        Tag,
-        on_delete=models.CASCADE,
-        related_name='recipes_by_tag'
-    )
-
-    class Meta:
-        verbose_name = 'Тег в рецепте'
-        verbose_name_plural = 'Теги в рецептах'
-
-    def __str__(self) -> str:
-        return f'{self.recipe.name} - {self.tags.name}'

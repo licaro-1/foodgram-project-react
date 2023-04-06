@@ -8,7 +8,7 @@ from Recipes.models import Recipe
 
 
 def delete_subscribtion_by_user_and_author(user: User,
-                                           author: User) -> Union[None, False]:
+                                           author: User) -> Union[None, bool]:
     """Удаляет подписку пользователя на автора."""
     if not _user_is_author(user, author):
         subscribe = Subscription.objects.filter(
@@ -22,7 +22,7 @@ def delete_subscribtion_by_user_and_author(user: User,
 
 
 def create_subscribtion_by_user(user: User,
-                                author: User) -> Union[User, False]:
+                                author: User) -> Union[User, bool]:
     """Создает подписку между пользователем и автором, если та отсутствует."""
     if (not _check_already_subscribe(user, author) and
             not _user_is_author(user, author)):
@@ -47,7 +47,7 @@ def _user_is_author(user, author) -> bool:
 
 
 def add_recipe_to_shopping_cart(author: User,
-                                recipe: Recipe) -> Union[Recipe, False]:
+                                recipe: Recipe) -> Union[Recipe, bool]:
     """Добавляет рецепт в список покупок."""
     if not _check_recipe_in_shop_cart(author, recipe):
         ShoppingCart.objects.create(author=author, recipe=recipe)
@@ -56,7 +56,7 @@ def add_recipe_to_shopping_cart(author: User,
 
 
 def delete_recipe_from_shopping_cart(author: User,
-                                     recipe: Recipe) -> Union[None, False]:
+                                     recipe: Recipe) -> Union[None, bool]:
     """Удаляет рецепт из списка покупок."""
     if _check_recipe_in_shop_cart(author, recipe):
         ShoppingCart.objects.filter(author=author, recipe=recipe).delete()
@@ -75,17 +75,16 @@ def _check_recipe_in_shop_cart(author: User, recipe: Recipe) -> bool:
 
 
 def add_recipe_to_favourite(author: User,
-                            recipe: Recipe) -> Union[None, False]:
+                            recipe: Recipe) -> Union[None, bool]:
     """Добавляет рецепт в список избранных."""
     if not _check_recipe_in_favourite(author, recipe):
         Favourites.objects.create(author=author, recipe=recipe)
         return None
     return False
-    pass
 
 
 def revome_recipe_from_favourite(author: User,
-                                 recipe: Recipe) -> Union[None, False]:
+                                 recipe: Recipe) -> Union[None, bool]:
     """Удаляет рецепт из списка избранных."""
     if _check_recipe_in_favourite(author, recipe):
         Favourites.objects.filter(author=author, recipe=recipe).delete()

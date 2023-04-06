@@ -21,3 +21,12 @@ class IsAdminOrAuthor(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return bool(request.user.is_authenticated)
+
+
+class IsAdmin(permissions.BasePermission):
+
+    def has_object_permission(self, request, view):
+        return bool(request.user.is_superuser)
+
+    def has_permission(self, request, view):
+        return bool(request.user.is_authenticated)

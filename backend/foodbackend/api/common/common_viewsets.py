@@ -3,12 +3,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.serializers import UserSerializer, UserChangePasswordSerializer
-from ..permissions import IsAdminOwnerOrReadOnly, IsAdminOrAuthor
+from ..permissions import IsAdminOrAuthor
 
 
 class CommonUserViewSet(viewsets.ViewSet):
     """
-    Общий вьюсет пользователя с методами изменения 
+    Общий вьюсет пользователя с методами изменения
     пароля и отображения личной информации.
     """
 
@@ -43,3 +43,23 @@ class CommonUserViewSet(viewsets.ViewSet):
                 user.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors)
+
+
+class CommonPermissionByActionViewSet(viewsets.ViewSet):
+
+    def get_permissions(self):
+        try:
+            return [permission() for permission
+                    in self.permission_classes_by_action[self.action]]
+        except KeyError:
+            if self.action:
+                action_func = getattr(self, self.action, {})
+                action_func_kwargs = getattr(action_func, 'kwargs', {})
+                permission_classes = action_func_kwargs.get(
+                    'permission_classes'
+                )
+            else:
+                permission_classes = None
+
+            return [permission() for permission
+                    in (permission_classes or self.permission_classes)]
