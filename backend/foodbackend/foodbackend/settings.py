@@ -78,8 +78,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ORIGIN_ALLOW_ALL = False
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+    'http://51.250.91.245',
+    'http://localhost',
+    'http://127.0.0.1',
+)
 
 
 ROOT_URLCONF = 'foodbackend.urls'
