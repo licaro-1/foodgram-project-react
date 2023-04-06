@@ -45,7 +45,7 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/foodgrambackend:v1.0
   
   build_and_push_frontend_to_docker_hub:
-    name: Push Docker Backend image to Docker Hub
+    name: Push Docker Frontend image to Docker Hub
     runs-on: ubuntu-latest
     needs: tests
     steps:
@@ -80,6 +80,7 @@ jobs:
           script: |
             sudo docker-compose stop
             sudo docker-compose rm backend
+            sudo docker-compose rm frontend
             rm .env
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
