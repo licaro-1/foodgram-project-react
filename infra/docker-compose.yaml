@@ -20,6 +20,7 @@ services:
     image: licaroo/foodgrambackend:v1.0
     # build:
     #   context: ../backend/foodbackend/
+    command: gunicorn --bind 0.0.0.0:8000 foodbackend.wsgi
     restart: always
     depends_on:
       - db
