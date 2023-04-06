@@ -120,7 +120,7 @@ class RecipeIngredients(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
         related_name='recipe_ingredients'
-        )
+    )
     amount = models.PositiveIntegerField('Количество')
 
     class Meta:

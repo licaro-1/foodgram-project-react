@@ -29,15 +29,15 @@ urlpatterns = [
     ),
     path('users/<int:user_id>/subscribe/',
          SubscriptionCreateDestroyViewSet.as_view({
-            'post': 'create', 'delete': 'destroy'
-            }),
+             'post': 'create', 'delete': 'destroy'
+         }),
          name='subscribe'),
     path('recipes/download_shopping_cart/',
          DownloadCart.as_view(), name='download_cart'),
     path('recipes/<int:pk>/shopping_cart/',
          ShoppingCartCreateDestroy.as_view({
              'delete': 'destroy', 'post': 'create'
-            })),
+         })),
     path('recipes/<int:pk>/favorite/',
          FavouritesViewSet.as_view({'delete': 'destroy', 'post': 'create'})),
     path('auth/token/login/', TokenCreateView.as_view(), name='login'),

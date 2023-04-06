@@ -24,8 +24,8 @@ def delete_subscribtion_by_user_and_author(user: User,
 def create_subscribtion_by_user(user: User,
                                 author: User) -> Union[User, bool]:
     """Создает подписку между пользователем и автором, если та отсутствует."""
-    if (not _check_already_subscribe(user, author) and
-            not _user_is_author(user, author)):
+    if (not _check_already_subscribe(user, author)
+            and not _user_is_author(user, author)):
         subscribe = Subscription.objects.create(user=user, author=author)
         return subscribe
     return False
