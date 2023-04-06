@@ -16,7 +16,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
-      - ../.env
+      - ./.env
 
   backend:
     image: licaroo/foodgrambackend:v1.0
@@ -29,13 +29,14 @@ services:
       - media_value:/foodbackend_build/media/
       - static_value:/foodbackend_build/static/
     env_file:
-      - ../.env
+      - ./.env
 
   nginx:
     image: nginx:1.21.3-alpine
 
     ports:
       - "80:80"
+
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
