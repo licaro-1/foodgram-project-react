@@ -8,8 +8,6 @@ services:
     #   dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
-    depends_on:
-      - backend
 
   db:
     image: postgres:13.0-alpine
