@@ -1,5 +1,3 @@
-# praktikum_new_diplom
-
 ![Main tests](https://github.com/licaro-1/foodgram-project-react/actions/workflows/foodgram_workflow.yaml/badge.svg)
 
 ```
