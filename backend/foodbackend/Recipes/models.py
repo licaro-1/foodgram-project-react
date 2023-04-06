@@ -106,7 +106,6 @@ class Recipe(models.Model):
         recipe = get_object_or_404(Recipe, id=self.id)
         return recipe.recipes_fav.all().count()
 
-
     add_to_favorite_count.fget.short_description = 'Кол-во добавлений \
                                                     в избранное'
 
