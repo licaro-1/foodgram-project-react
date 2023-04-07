@@ -3,9 +3,6 @@ services:
 
   frontend:
     image: licaroo/foodgramfrontend:v.1.0
-    # build:
-    #   context: ../frontend
-    #   dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -18,8 +15,6 @@ services:
 
   backend:
     image: licaroo/foodgrambackend:v1.0
-    # build:
-    #   context: ../backend/foodbackend/
     command: gunicorn --bind 0.0.0.0:8000 foodbackend.wsgi
     restart: always
     depends_on:
