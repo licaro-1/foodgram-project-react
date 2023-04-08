@@ -189,5 +189,5 @@ class FavouritesViewSet(CreateDestroyViewSet):
         remove_recipe = revome_recipe_from_favourite(request.user, recipe)
         if remove_recipe is None:
             return Response(status=status.HTTP_204_NO_CONTENT)
-        error = {'error': 'Указанного рецепта нет в списке избранных'}
+        error = {'errors': 'Указанного рецепта нет в списке избранных'}
         return Response(error)
