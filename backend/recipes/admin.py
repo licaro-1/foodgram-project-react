@@ -6,6 +6,12 @@ from users.models import User
 from recipes.models import (Recipe, Tag, Ingredient, RecipeIngredients)
 
 
+class RecipeIngredientsInline(admin.TabularInline):
+    model = RecipeIngredients
+    extra = 0
+    min_num = 1
+
+
 class UserAdmins(UserAdmin):
     """Админка пользователя."""
     model = User
@@ -23,6 +29,7 @@ class IngredientsAdmin(admin.ModelAdmin):
 class RecipesAdmin(admin.ModelAdmin):
     """Админка рецептов."""
     list_display = ['id', 'name', 'author', 'favorite_count']
+    inlines = [RecipeIngredientsInline]
     list_filter = ('author', 'name', 'tags')
 
 

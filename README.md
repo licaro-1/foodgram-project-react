@@ -1,5 +1,13 @@
 ![Main tests](https://github.com/licaro-1/foodgram-project-react/actions/workflows/foodgram_workflow.yaml/badge.svg)
 
+## FOODGRAM PROJECT
+
+```
+Проект для создания рецептов. С наличием подписок, избранных 
+рецептов и возможностью выгружать ингредиенты из списка покупок.
+```
+
+
 ```
 Ознакомиться с API документацией проекта можно тут:
 http://51.250.91.245/api/docs/

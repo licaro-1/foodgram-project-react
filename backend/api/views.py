@@ -93,22 +93,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
             return RecipePostSerializer
         return RecipesListSerializer
 
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        instance = self.perform_create(serializer)
-        recipe = get_object_or_404(Recipe, id=serializer.data['id'])
-        instance_serializer = RecipesListSerializer(
-            recipe,
-            context={'request': request}
-        )
-        return Response(instance_serializer.data)
-
     def update(self, request, pk=None, partial=True):
         recipe = get_object_or_404(Recipe, id=pk)
-        if request.user.is_authenticated and recipe.author != request.user:
-            errors = {'errors': 'Вы не являетесь автором рецепта'}
-            return Response(errors, status=status.HTTP_403_FORBIDDEN)
         serializer = self.get_serializer(data=request.data, instance=recipe,
                                          partial=True)
         serializer.is_valid(raise_exception=True)
@@ -126,7 +112,7 @@ class SubscriptionsListViewSet(ListViewSet):
     pagination_class = MainPagination
 
     def get_queryset(self):
-        queryset = Subscription.objects.filter(user=self.request.user).all()
+        queryset = self.request.user.subscriber.all()
         return queryset
 
 

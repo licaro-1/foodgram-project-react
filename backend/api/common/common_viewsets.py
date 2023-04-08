@@ -42,7 +42,8 @@ class CommonUserViewSet(viewsets.ViewSet):
                 user.set_password(new_password)
                 user.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(serializer.errors)
+        errors = {'errors': 'Неверный пароль'}
+        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommonPermissionByActionViewSet(viewsets.ViewSet):

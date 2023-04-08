@@ -80,11 +80,10 @@ class Recipe(models.Model):
     image = models.ImageField(
         'Изображение',
         upload_to='recipe/',
-        blank=True
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveIntegerField(
         'Время приготовления',
-        validators=[MinValueValidator(1)]
+        validators=[MinValueValidator(1, 'Время приготовления должно быть больше 0')]
     )
     tags = models.ManyToManyField(
         Tag,

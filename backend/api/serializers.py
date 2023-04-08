@@ -1,5 +1,6 @@
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.validators import UniqueValidator
+from rest_framework.exceptions import ValidationError
 
 from users.models import User
 from users_capabilities.models import Subscription
@@ -207,6 +208,11 @@ class RecipePostSerializer(serializers.ModelSerializer, IsFavAndInShopCart):
         return recipe
 
     def update(self, instance, validated_data):
+        request = self.context['request']
+        if request.user.is_authenticated and instance.author != request.user:
+            validate_error = ValidationError({'errors': 'Вы не являетесь автором рецепта'})
+            validate_error.status_code = 403
+            raise validate_error
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)
         instance.cooking_time = validated_data.get('cooking_time',
@@ -221,6 +227,13 @@ class RecipePostSerializer(serializers.ModelSerializer, IsFavAndInShopCart):
         )
         instance.save()
         return instance
+
+    def to_representation(self, instance):
+        serializer = RecipesListSerializer(
+            instance,
+            context={'request': self.context['request']}
+        )
+        return serializer.data
 
 
 class SubscriptionsSerializer(serializers.ModelSerializer, IsSubscribed):
