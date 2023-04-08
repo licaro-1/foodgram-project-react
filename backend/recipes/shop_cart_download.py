@@ -16,7 +16,7 @@ class DownloadCart(APIView):
         user = request.user
         shop_cart_list = _get_ingredients_dictionary_by_user(user)
         pdfmetrics.registerFont(
-            TTFont('wiguru-13', './Recipes/ttf/wiguru-13.ttf'))
+            TTFont('wiguru-13', './recipes/ttf/wiguru-13.ttf'))
         buffer = io.BytesIO()
         file = canvas.Canvas(buffer)
         file.setFont('wiguru-13', 40)
