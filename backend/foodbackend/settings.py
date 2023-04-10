@@ -86,7 +86,6 @@ CORS_ORIGIN_WHITELIST = (
     'http://158.160.37.39',
     'http://localhost',
     'http://127.0.0.1',
-    
 )
 
 
