@@ -70,10 +70,6 @@ class Recipe(models.Model):
         'Название',
         max_length=120
     )
-    ingredients = models.ManyToManyField(
-        Ingredient,
-        verbose_name='Ингредиенты'
-    )
     text = models.TextField(
         'Описание'
     )
@@ -120,7 +116,12 @@ class RecipeIngredients(models.Model):
         on_delete=models.CASCADE,
         related_name='recipe_ingredients'
     )
-    amount = models.PositiveIntegerField('Количество')
+    amount = models.PositiveIntegerField(
+        'Количество',
+        validators=[MinValueValidator(
+            1,
+            'Кол-во ингредиента должно быть больше 0'
+        )])
 
     class Meta:
         verbose_name = 'Ингредиент в рецепте'

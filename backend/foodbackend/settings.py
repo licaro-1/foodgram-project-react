@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '51.250.91.245',
     'backend',
+    '158.160.37.39'
 ]
 
 
@@ -82,8 +83,10 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
     'http://51.250.91.245',
+    'http://158.160.37.39',
     'http://localhost',
     'http://127.0.0.1',
+    
 )
 
 
